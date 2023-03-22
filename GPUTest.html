@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    /* .a {
+        background-color: darkgreen;
+        width: 50px;
+        height: 50px;
+        transform: translate(0, 0);
+        animation: slide 3.7s ease-in-out infinite;
+    } */
+    
+    /* @keyframes slide {
+        25% {
+            transform: translate(250px, 0);
+        }
+        50% {
+            transform: translate(250px, 250px);
+        }
+        75% {
+            transform: translate(0, 250px);
+        }
+    } */
+</style>
+
+<body>
+    <div class="a" id="div1">
+        3333
+    </div>
+</body>
+<script>
+    var getSingle = function( fn ){
+        var result;
+        return function(){
+            return result || ( result = fn .apply(this, arguments ) );
+        }
+    };
+    var bindEvent = getSingle(function(){
+        console.log('22222');
+        document.getElementById( 'div1' ).onclick = function(){
+            alert ( 'click' );
+        }
+        return true;
+    });
+
+    var render = function(){
+        console.log( '开始渲染列表' );
+        bindEvent();
+    };
+
+    render();
+    render();
+    render();
+
+</script>
+</html>

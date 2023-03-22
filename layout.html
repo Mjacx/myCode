@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>
+        <div></div>
+        <div>
+            <div></div>
+        </div>
+    </div>
+</body>
+<script>
+    /**
+     * 巧用new Function 非合法JSON对象字符串合法化
+     **/
+    let str = `{ "id": 10393, name: 'zhangxinxu', 'date': '2022-04-30' }`;
+    console.log(JSON.stringify(Function('return ' + str)()));
+
+
+    /**
+     * Object.prototype.toString(type) 返回字符串[object ‘type’]
+     * 利用Object.prototype.toString 判断数据类型
+     **/
+    var isType = function(type){
+        return function(obj){
+            return Object.prototype.toString.call(obj) === '[object ' + type + ']';
+        }
+    }
+    var isObject = isType('Object');
+    var isArray = isType('Array');
+    var isString = isType('String');
+
+    let a = isArray([1,2,3]);
+    // console.log(a);
+
+    /**
+     * 利用循环，批量注册isType函数
+     **/ 
+    var Type = {};
+    for (let i = 0, type; type = ['String','Array','Number'][i++];) {
+        (function(type){
+            Type['is' + type] = function(obj){
+                return Object.prototype.toString.call(obj) === '[object ' + type +']'
+            }
+        })(type)
+    }
+
+    console.log(Type.isArray([]));
+    console.log(Type.isString('123'));
+
+</script>
+</html>

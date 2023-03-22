@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>闭包作用</title>
+</head>
+<body>
+    <div>测试</div>
+</body>
+<script>
+    /**
+     * 1. 封装变量 闭包帮助一些不需要暴露在全局的变量封装成私有变量
+     * 
+     *  以下是计算乘积的简单函数
+     **/
+    var mult = function(){
+        var a = 1;
+        for (let i = 0, l= arguments.length; i<l; i++) {
+          a = a * arguments[i];
+        }
+        return a;
+    }
+    console.log(mult(1,2,2,4));
+
+
+    /**
+     * 对于参数相同的函数，还要进行计算是一种浪费，
+     * 以下函数加入 *缓存机制* 来提高此函数的性能
+     **/
+     var cache = {};
+     var multByCache = function(){
+        var args = Array.prototype.join.call(arguments,',');
+
+        //如果参数相同，则直接返回缓存中的结果
+        if(cache[args]){
+            return cache[args];
+        }
+        var a = 1;
+        for (let i = 0, l = arguments.length; i < l; i++) {
+            a = a * arguments[i];
+        }
+        return cache[args] = a;  //每次不相同的参数都存入缓存
+     };
+     console.log(multByCache(1,2,3));
+     console.log(multByCache(1,2,3));  //相同的参数不必进行二次计算
+
+
+     /**
+      *上面函数cache变量暴露在全局
+      *将cache 封闭在函数内部
+      **/
+      var mult1 = (function(){
+        var cache = {};
+        return function(){
+            var args = Array.prototype.join.call(arguments,',');
+            if(cache[args]){
+                return cache[args];
+            }
+            var a = 1;
+            for (let i = 0, l = arguments.length; i < l; i++) {
+                a = a * arguments[i];
+            }
+            return cache[args] = a;
+        }
+      })();
+    console.log(mult1(1,2,3));
+    console.log(mult1(1,2,3));
+
+    /**
+     * 把不需要在其他地方使用的小函数 用闭包封闭起来
+     **/
+     var mult2 = (function(){
+        var cache = {};
+
+        let calculate = function(){
+            var a = 1;
+            for (let i = 0, l = arguments.length; i < l; i++) {
+                a = a * arguments[i];
+            }
+            return a;
+        }
+        return function(){
+            var args = Array.prototype.join.call(arguments,',');
+            if(cache[args]){
+                return cache[args];
+            }
+            return cache[args] = calculate.apply(null,arguments);
+        }
+      })();
+    console.log(mult2(1,2,3));
+    console.log(mult2(1,2,3));
+
+    /**
+     * 2. 延续局部变量的寿命
+     * 
+     *  img对象经常用于进行 *数据上报*，如下所示
+     *  
+     **/
+    var report = function(src){
+        var img = new Image();
+        img.src = src;
+    } 
+
+    report('http://baidu.com')
+    /**
+     * 但在有些低版本浏览器中，使用report函数进行数据上报会丢失30%左右的数据
+     * 丢失的原因是img是report函数中的局部变量，当report函数的调用结束后，img局部变量就会被销毁，
+     * 而此时还没得及发送HTTP请求，多以此次请求会丢失掉
+     *  解决办法： img变量用闭包封闭起来
+     **/
+    var report = (function(){
+        var imgs = [];
+        return function(src){
+            var img = new Image();
+            imgs.push(img);
+            img.src = src;
+        }
+    })();
+
+</script>
+</html>

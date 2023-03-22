@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+
+	</style>
+</head>
+<body>
+
+	<script type="text/javascript">
+		let getNowTime =function () {
+			let dateTime;
+			let yy = new Date().getFullYear();
+			let MM = new Date().getMonth() + 1;
+			let dd = new Date().getDate();
+			let hh = new Date().getHours();
+			let mm = new Date().getMinutes() < 10 ? '0' + new Date().getMinutes():new Date().getMinutes();
+			let ss = new Date().getSeconds() < 10 ? '0' + new Date().getSeconds():new Date().getSeconds();
+			dateTime = yy + '-' + MM + '-' + dd + ' ' + hh + ':' + mm + ':' + ss;
+			return dateTime;
+		}
+
+		var inter = ()=>{
+		 window.INTERVAL = setInterval(() => {
+				clearInterval(INTERVAL);
+				console.log('---------------------interFun------------------',getNowTime());
+				Pro();
+			}, 2000);
+		}
+	    var Pro = ()=>{
+			Promise.resolve('tttttt').then((resolve)=>{
+				// setTimeout(() => {
+				// 	Pro()
+				// 	console.log('interFun');
+				// }, 4000);
+				inter();
+				console.log('start ---- for');
+				var flag,num = 100000000;
+				
+				for (let i = 0; i < num; i++) {
+					if(i === num-1){
+						flag = i;
+					}
+				}
+				console.log(flag);
+				console.log('end ---- for');
+
+			}) 
+		}
+		// Pro();
+
+		var timeChunk = function( ary, fn, count ){
+			console.log(ary);
+			var obj,
+			t;
+
+			var len = ary.length;
+
+			var start = function(){
+				for ( var i = 0; i < Math.min( count || 1, ary.length ); i++ ){
+					var obj = ary.shift();
+					fn( obj );
+				}
+			};
+
+			return function(){
+				t = setInterval(function(){
+					if ( ary.length === 0 ){  // 如果全部节点都已经被创建好
+						return clearInterval( t );
+					}
+					start();
+				}, 200 );    // 分批执行的时间间隔，也可以用参数的形式传入
+
+			};
+
+		};
+
+		var ary = [];
+
+		for ( var i = 1; i <= 100; i++ ){
+			ary.push( i );
+		};
+
+		var renderFriendList = timeChunk( ary, function( n ){
+			var div = document.createElement( 'div' );
+			div.innerHTML = n;
+			document.body.appendChild( div );
+		}, 8 );
+
+		renderFriendList();
+
+		var myImage = (function(){
+            var imgNode = document.createElement( 'img' );
+            document.body.appendChild( imgNode );
+
+            return {
+              setSrc: function( src ){
+                  imgNode.src = src;
+              }
+            }
+        })();
+
+        var proxyImage = (function(){
+            var img = new Image;
+            img.onload = function(){
+              myImage.setSrc( this.src );
+            }
+            return {
+              setSrc: function( src ){
+                  myImage.setSrc( 'file:// /C:/Users/svenzeng/Desktop/loading.gif' );
+                  img.src = src;
+              }
+            }
+        })();
+
+        proxyImage.setSrc( 'http://imgcache.qq.com/music/photo/k/000GGDys0yA0Nk.jpg' );
+	</script>
+</body>
+</html>

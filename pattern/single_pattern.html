@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>single 单例模式</title>
+</head>
+<body>
+    
+</body>
+<script>
+    
+    /**
+     * 单例模式的定义是：保证一个类仅有一个实例，并提供一个访问它的全局访问点。单例模式是一种常用的模式，有一些对象我们往往只需要一个，
+     * 比如线程池、全局缓存、浏览器中的window对象等。在JavaScript开发中，单例模式的用途同样非常广泛。试想一下，当我们单击登录按钮的时候，
+     * 页面中会出现一个登录浮窗，而这个登录浮窗是唯一的，无论单击多少次登录按钮，这个浮窗都只会被创建一次，那么这个登录浮窗就适合用单例模式来创建。
+     */ 
+
+     
+    /**
+     * 标准单例模式
+     * 缺点：不透明性
+     */ 
+        var Singleton = function( name ){
+            this.name = name;
+            this.instance = null;
+        };
+
+        Singleton.prototype.getName = function(){
+            alert ( this.name );
+        };
+
+        Singleton.getInstance = function( name ){
+            if ( ! this.instance ){
+              this.instance = new Singleton( name );
+            }
+            return this.instance;
+        };
+
+        var a = Singleton.getInstance( 'sven1' );
+        var b = Singleton.getInstance( 'sven2' );
+
+        alert ( a === b );    // true
+
+    /**
+     * 透明的单例模式
+     */ 
+     var CreateDiv = (function(){
+
+        var instance;
+
+        var CreateDiv = function( html ){
+            if ( instance ){
+                return instance;
+            }
+            this.html = html;
+            this.init();
+            return instance = this;
+        };
+
+        CreateDiv.prototype.init = function(){
+            var div = document.createElement( 'div' );
+            div.innerHTML = this.html;
+            document.body.appendChild( div );
+        };
+
+        return CreateDiv;
+
+    })();
+    debugger
+    var a = new CreateDiv( 'sven1' );
+    var b = new CreateDiv( 'sven2' );
+
+    console.log(( a === b ));     // true
+
+
+    //用代理实现单例模式
+    var CreateDiv = function( html ){
+        this.html = html;
+        this.init();
+    };
+
+    CreateDiv.prototype.init = function(){
+        var div = document.createElement( 'div' );
+        div.innerHTML = this.html;
+        document.body.appendChild( div );
+    };
+
+    var ProxySingletonCreateDiv = (function(){
+
+        var instance;
+        return function( html ){
+            if ( !instance ){
+                instance = new CreateDiv( html );
+            }
+
+            return instance;
+        }
+
+    })();
+
+    var a = new ProxySingletonCreateDiv( 'sven1' );
+    var b = new ProxySingletonCreateDiv( 'sven2' );
+
+    alert ( a === b );
+    /**
+     * 动态地创建命名空间,减少全局变量污染
+     */ 
+
+    var MyApp = {};
+
+    MyApp.namespace = function( name ){
+        var parts = name.split( '.' );
+        var current = MyApp;
+        for ( var i in parts ){
+        if ( ! current[ parts[ i ] ] ){
+            current[ parts[ i ] ] = {};
+        }
+        current = current[ parts[ i ] ];
+        }
+    };
+
+    MyApp.namespace( 'event' );
+    MyApp.namespace( 'dom.style' );
+
+    console.dir( MyApp );
+
+    // 上述代码等价于：
+
+    var MyApp = {
+        event: {},
+        dom: {
+            style: {}
+        }
+    };
+    /**
+     * 使用闭包封装私有变量 
+     */ 
+    var user = (function(){
+        var __name = 'sven',
+            __age = 29;
+
+        return {
+            getUserInfo: function(){
+                return __name + '-' + __age;
+            }
+        }
+
+    })();
+    /**
+     * 惰性单例模式 
+     */ 
+    var createLoginLayer = (function(){
+        var div;
+        return function(){
+            if ( ! div ){
+                div = document.createElement( 'div' );
+                div.innerHTML = '我是登录浮窗';
+                div.style.display = 'none';
+                document.body.appendChild( div );
+            }
+
+            return div;
+        }
+    })();
+    document.getElementById( 'loginBtn' ).onclick = function(){
+        var loginLayer = createLoginLayer();
+        loginLayer.style.display = 'block';
+    };
+
+    /**
+     *  通用的惰性单例
+     */
+    var getSingle = function( fn ){
+        var result;
+        return function(){
+            return result || ( result = fn .apply(this, arguments ) );
+        }
+    };
+
+    var createLoginLayer = function(){
+        var div = document.createElement( 'div' );
+        div.innerHTML = '我是登录浮窗';
+        div.style.display = 'none';
+        document.body.appendChild( div );
+        return div;
+    };
+
+    var createSingleLoginLayer = getSingle( createLoginLayer );
+
+    document.getElementById( 'loginBtn' ).onclick = function(){
+        var loginLayer = createSingleLoginLayer();
+        loginLayer.style.display = 'block';
+    };
+
+
+
+</script>
+</html>
