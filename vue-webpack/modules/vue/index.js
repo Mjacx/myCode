@@ -1,40 +1,45 @@
-import { getFirstChildNode } from './shared/util';
-import reactice from './reactive';
+import { getFirstNodeChild } from "./shared/util";
+import reactive from "./reactive";
+import expression from "./pools";
+import event from "./event";
+import { render } from "./render";
 
 const vue = {
     createApp
 }
 
 function createApp(component){
-    console.log(component);
+    // console.log(component);
     const vm = {};
     const {
-        template,
-        methods,
-        data
+        data,
+        method,
+        template
     } = component;
 
     vm.mount = mount;
-    vm.$nodes = createNode(template);
-    
-    const init = () => {
-        reactice(vm, data);
+    vm.$node = getNodes(template);
+
+    function init(){
+        reactive(vm, data);
+        expression(vm, method)
+        event(vm);
+        render(vm);
     }
 
-    console.log(vm);
+    function mount(eleId){
+        document.querySelector(eleId).appendChild(this.$node);
+    }
+
+    function getNodes(template){
+       let _template = document.createElement('div');
+       _template.innerHTML = template;
+       return getFirstNodeChild(_template);
+    }
+
     init();
-
     return vm;
-}
 
-function createNode(template){
-    const _template = document.createElement('div');
-    _template.innerHTML = template;
-    return getFirstChildNode(_template);
-}
-
-function mount(el){
-    // console.log(el,this);
 }
 
 export {
